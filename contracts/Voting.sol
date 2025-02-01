@@ -5,9 +5,9 @@ pragma solidity 0.8.28;
 import "./IERC20.sol";
 
 contract Voting {
-    address votingToken;
-    address owner;
-    address[] users;
+    address public votingToken;
+    address public owner;
+    address[] public users;
     mapping(address => uint) tokenAllowance;
     mapping(address => uint) userVote;
     Proposal[] proposals;
@@ -78,6 +78,15 @@ contract Voting {
         require(start < end && start > block.timestamp);
         require(!isExistProposal(id));
         proposals.push(Proposal(id, start, end, 0, 0, title));
+    }
+
+    function showResult(
+        uint id
+    ) public view onlyOwner returns (uint aggre, uint disagreement) {
+        require(isExistProposal(id));
+        Proposal memory proposal = FindProposal(id);
+        require(proposal.endTime >= block.timestamp);
+        return (proposal.agreedVotes, proposal.disagreement);
     }
 
     function FindProposal(
